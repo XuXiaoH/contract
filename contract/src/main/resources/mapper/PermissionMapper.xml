@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sky.contract.mapper.PermissionMapper">
+
+    <resultMap id="ChildrenResultMap" type="com.sky.contract.model.Permission">
+        <collection property="list" ofType="com.sky.contract.model.Permission" select="getMenuChildren"
+                    column="permissionId">
+        </collection>
+    </resultMap>
+
+    <sql id="BaseColumnResult">
+       permission_id as permissionId,url,name,parent_id as parentId,type,sort,is_show  as isShow
+    </sql>
+
+    <sql id="BaseColumnResultForA">
+        a.permission_id as permissionId,a.url,a.name,a.parent_id as parentId,a.type,a.sort,a.is_show as isShow
+    </sql>
+
+    <select id="getMenuPermissions" resultMap="ChildrenResultMap">
+        SELECT
+        <include refid="BaseColumnResult"/>
+        FROM permission
+        WHERE parent_id = 0
+        ORDER BY sort asc
+    </select>
+
+    <select id="getMenuChildren" parameterType="long" resultType="com.sky.contract.model.Permission">
+        SELECT
+        <include refid="BaseColumnResult"/>
+        FROM permission
+        WHERE parent_id = #{permissionId} and type = 1
+        ORDER BY sort asc
+    </select>
+
+
+    <select id="getPermissionsByUid" parameterType="long" resultType="com.sky.contract.model.Permission">
+        select
+        <include refid="BaseColumnResultForA"/>
+        from
+        permission a
+        left join role_permission b on a.permission_id=b.permission_id
+        left join user_role c on b.role_id=c.role_id
+        left join user d on c.uid=d.uid
+        where d.uid=#{uid}
+    </select>
+
+
+    <select id="getPermissionsByRoleId" parameterType="long" resultType="com.sky.contract.model.Permission">
+        select
+        <include refid="BaseColumnResultForA"/>
+        FROM
+        permission a
+        left join role_permission b on a.permission_id=b.permission_id
+        where b.role_id=#{roleId}
+    </select>
+
+
+</mapper>

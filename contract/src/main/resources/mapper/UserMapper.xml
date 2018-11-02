@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sky.contract.mapper.UserMapper">
+
+
+    <select id="getAllUser" resultType="com.sky.contract.model.User">
+        SELECT uid,real_name as realName,username,password,status,createAt,updateAt,note
+        FROM USER
+        WHERE username!='sky'
+    </select>
+
+
+    <select id="getAllChildren" parameterType="long" resultType="Long">
+        SELECT uid
+        FROM USER
+        WHERE p_uid = #{pUid}
+    </select>
+
+
+    <select id="getUserByIds" resultType="com.sky.contract.model.User">
+        SELECT uid,real_name as realName
+        FROM USER
+        where uid IN
+        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+    </select>
+
+
+
+</mapper>

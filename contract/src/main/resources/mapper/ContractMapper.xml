@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sky.contract.mapper.ContractMapper">
+
+
+    <sql id="BaseColumnResult">
+        contract_id as contractId,contract.*
+    </sql>
+
+    <sql id="BaseColumnResultForParentName">
+        a.contract_id as contractId,a.*,b.name as parentName
+    </sql>
+
+
+    <select id="getContractByUsers" resultType="com.sky.contract.model.Contract">
+        SELECT
+        <include refid="BaseColumnResult"/>
+        FROM contract where project_id in
+        (
+        SELECT a.project_id FROM project a where a.uid in
+        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+        )
+        and status=#{status}
+    </select>
+
+
+    <select id="getContractByProjectTypeAndContractType" resultType="com.sky.contract.model.Contract">
+        SELECT
+        <include refid="BaseColumnResult"/>
+        FROM contract left join project on contract.project_id = project.project_id
+        where project.type=#{type}
+        <if test="contractType != null">
+            and contract.type=#{contractType}
+        </if>
+    </select>
+
+    <select id="getContractByProjectIdAndType" resultType="com.sky.contract.model.Contract">
+        SELECT
+        <include refid="BaseColumnResultForParentName"/>
+        FROM contract a left join contract b on a.pid = b.contract_id
+        where a.project_id=#{projectId} and a.type=#{type}
+    </select>
+
+
+
+
+</mapper>

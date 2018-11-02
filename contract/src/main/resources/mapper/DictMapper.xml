@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sky.contract.mapper.DictMapper">
+
+    <resultMap id="ResultMapForParent" type="com.sky.contract.model.Dict">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="dict_id" jdbcType="BIGINT" property="dictId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="pid" jdbcType="BIGINT" property="pid"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="code" jdbcType="TINYINT" property="code"/>
+        <result column="sort" jdbcType="TINYINT" property="sort"/>
+        <result column="createAt" jdbcType="TIMESTAMP" property="createAt"/>
+        <result column="updateAt" jdbcType="TIMESTAMP" property="updateAt"/>
+        <association property="parent" javaType="com.sky.contract.model.Dict">
+            <result column="parent_name" jdbcType="VARCHAR" property="name"/>
+        </association>
+    </resultMap>
+
+
+    <select id="getAll"  resultMap="ResultMapForParent">
+        select
+        a.*,b.name as parent_name
+        from dict a left join dict b on a.pid=b.dict_id
+    </select>
+
+
+    <select id="getMaxCodeByPid" parameterType="long" resultType="short">
+         select
+         code
+         from dict
+         WHERE dict.pid=#{pid}
+         ORDER by code DESC
+         limit 1
+    </select>
+
+    <select id="getName"   resultType="String" >
+        SELECT b.name
+        from dict a left join dict b on a.dict_id=b.pid
+        where a.title=#{title} and b.code=#{code}
+    </select>
+
+</mapper>

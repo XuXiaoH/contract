@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sky.contract.mapper.ProjectMapper">
+
+    <resultMap id="ResultMapForUser" type="com.sky.contract.model.Project">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="project_id" jdbcType="BIGINT" property="projectId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="uid" jdbcType="BIGINT" property="uid"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="status" jdbcType="TINYINT" property="status"/>
+        <result column="note" jdbcType="VARCHAR" property="note"/>
+        <result column="createAt" jdbcType="TIMESTAMP" property="createAt"/>
+        <result column="updateAt" jdbcType="TIMESTAMP" property="updateAt"/>
+        <association property="user" javaType="com.sky.contract.model.User">
+            <result column="real_name" jdbcType="VARCHAR" property="realName"/>
+        </association>
+    </resultMap>
+
+
+    <select id="getAllProject" resultMap="ResultMapForUser">
+       SELECT a.*,b.real_name FROM project a left join user b on a.uid=b.uid
+    </select>
+
+    <select id="getProject" parameterType="long" resultMap="ResultMapForUser">
+        SELECT a.*,b.real_name FROM project a left join user b on a.uid=b.uid where a.project_id=#{projectId}
+    </select>
+
+
+    <select id="getProjectByUsers" resultMap="ResultMapForUser">
+        SELECT a.*,b.real_name FROM project a left join user b on a.uid=b.uid where a.uid in
+        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+    </select>
+
+
+
+    <select id="getProjectByUsersAndStatus" resultMap="ResultMapForUser">
+        SELECT a.*,b.real_name FROM project a left join user b on a.uid=b.uid where a.uid in
+        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+        AND a.status=#{status}
+    </select>
+
+
+
+</mapper>
